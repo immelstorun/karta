@@ -40,3 +40,9 @@ karta-cache = { workspace = true }
 eframe = { workspace = true }
 egui = { workspace = true }
 tracing = { workspace = true }
+
+[target.'cfg(target_os = "android")'.dependencies]
+# eframe на Android требует один из фича-флагов android-activity.
+# game-activity — современный вариант (AndroidX GameActivity).
+# Cargo объединяет фичи с обычной зависимостью eframe выше.
+eframe = { workspace = true, features = ["android-game-activity"] }
