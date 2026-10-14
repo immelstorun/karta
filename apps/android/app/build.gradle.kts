@@ -5,7 +5,8 @@ plugins {
 
 android {
     namespace = "com.karta.app"
-    compileSdk = 34
+    // compileSdk 35 требуется androidx.core:core:1.15.0.
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.karta.app"
