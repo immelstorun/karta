@@ -75,9 +75,6 @@ mod tests {
         let metadata = read_mbtiles_metadata(&db_path).expect("read failed");
         assert_eq!(metadata.name.as_deref(), Some("Test Layer"));
         assert_eq!(metadata.format.as_deref(), Some("png"));
-        assert_eq!(
-            metadata.bounds.as_deref(),
-            Some("37.0,55.0,38.0,56.0")
-        );
+        assert_eq!(metadata.bounds.as_deref(), Some("37.0,55.0,38.0,56.0"));
     }
 }

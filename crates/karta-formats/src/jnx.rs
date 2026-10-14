@@ -61,10 +61,7 @@ fn read_u32_le(data: &[u8], offset: usize) -> Result<u32, FormatError> {
     data.get(offset..offset + 4)
         .map(|b| u32::from_le_bytes([b[0], b[1], b[2], b[3]]))
         .ok_or_else(|| {
-            FormatError::BinaryRead(format!(
-                "not enough bytes for u32 at offset {}",
-                offset
-            ))
+            FormatError::BinaryRead(format!("not enough bytes for u32 at offset {}", offset))
         })
 }
 

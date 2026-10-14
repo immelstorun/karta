@@ -44,7 +44,9 @@ impl TileFetcher {
         for attempt in 0..=request.retry_count {
             if attempt > 0 {
                 let delay = Duration::from_millis(
-                    request.retry_delay_ms.saturating_mul(1u64 << (attempt - 1).min(30)),
+                    request
+                        .retry_delay_ms
+                        .saturating_mul(1u64 << (attempt - 1).min(30)),
                 );
                 tokio::time::sleep(delay).await;
             }

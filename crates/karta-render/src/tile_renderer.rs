@@ -69,7 +69,11 @@ mod tests {
     #[test]
     fn test_render_tile_increments_count() {
         let mut renderer = TileRenderer::new(RenderConfig::default());
-        let tile = TileId { x: 1, y: 2, zoom: 3 };
+        let tile = TileId {
+            x: 1,
+            y: 2,
+            zoom: 3,
+        };
         let img = image::DynamicImage::new_rgb8(256, 256);
         renderer.render_tile(&tile, &img);
         renderer.render_tile(&tile, &img);

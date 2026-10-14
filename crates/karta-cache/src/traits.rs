@@ -43,12 +43,7 @@ pub trait TileCache: Send + Sync {
     async fn get_tile(&self, layer: &str, tile: &TileId) -> Result<Option<Vec<u8>>, CacheError>;
 
     /// Записывает тайл в кэш.
-    async fn put_tile(
-        &self,
-        layer: &str,
-        tile: &TileId,
-        data: &[u8],
-    ) -> Result<(), CacheError>;
+    async fn put_tile(&self, layer: &str, tile: &TileId, data: &[u8]) -> Result<(), CacheError>;
 
     /// Удаляет тайл из кэша.
     async fn delete_tile(&self, layer: &str, tile: &TileId) -> Result<(), CacheError>;

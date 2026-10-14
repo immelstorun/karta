@@ -47,9 +47,7 @@ pub fn parse_gpx(data: &str) -> Result<Vec<Track>, FormatError> {
                         .attributes()
                         .filter_map(|a| a.ok())
                         .find(|a| a.key.as_ref() == b"lat")
-                        .and_then(|a| {
-                            String::from_utf8_lossy(&a.value).parse::<f64>().ok()
-                        })
+                        .and_then(|a| String::from_utf8_lossy(&a.value).parse::<f64>().ok())
                         .ok_or_else(|| {
                             FormatError::InvalidGpx("trkpt missing lat attribute".to_string())
                         })?;
@@ -57,9 +55,7 @@ pub fn parse_gpx(data: &str) -> Result<Vec<Track>, FormatError> {
                         .attributes()
                         .filter_map(|a| a.ok())
                         .find(|a| a.key.as_ref() == b"lon")
-                        .and_then(|a| {
-                            String::from_utf8_lossy(&a.value).parse::<f64>().ok()
-                        })
+                        .and_then(|a| String::from_utf8_lossy(&a.value).parse::<f64>().ok())
                         .ok_or_else(|| {
                             FormatError::InvalidGpx("trkpt missing lon attribute".to_string())
                         })?;
@@ -129,9 +125,7 @@ pub fn parse_gpx_waypoints(data: &str) -> Result<Vec<Waypoint>, FormatError> {
                         .attributes()
                         .filter_map(|a| a.ok())
                         .find(|a| a.key.as_ref() == b"lat")
-                        .and_then(|a| {
-                            String::from_utf8_lossy(&a.value).parse::<f64>().ok()
-                        })
+                        .and_then(|a| String::from_utf8_lossy(&a.value).parse::<f64>().ok())
                         .ok_or_else(|| {
                             FormatError::InvalidGpx("wpt missing lat attribute".to_string())
                         })?;
@@ -139,9 +133,7 @@ pub fn parse_gpx_waypoints(data: &str) -> Result<Vec<Waypoint>, FormatError> {
                         .attributes()
                         .filter_map(|a| a.ok())
                         .find(|a| a.key.as_ref() == b"lon")
-                        .and_then(|a| {
-                            String::from_utf8_lossy(&a.value).parse::<f64>().ok()
-                        })
+                        .and_then(|a| String::from_utf8_lossy(&a.value).parse::<f64>().ok())
                         .ok_or_else(|| {
                             FormatError::InvalidGpx("wpt missing lon attribute".to_string())
                         })?;
@@ -187,7 +179,9 @@ pub fn parse_gpx_waypoints(data: &str) -> Result<Vec<Waypoint>, FormatError> {
 pub fn export_gpx(tracks: &[Track], waypoints: &[Waypoint]) -> Result<String, FormatError> {
     let mut out = String::new();
     out.push_str("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    out.push_str("<gpx version=\"1.1\" creator=\"karta\" xmlns=\"http://www.topografix.com/GPX/1/1\">\n");
+    out.push_str(
+        "<gpx version=\"1.1\" creator=\"karta\" xmlns=\"http://www.topografix.com/GPX/1/1\">\n",
+    );
 
     for track in tracks {
         out.push_str("  <trk>\n");
@@ -214,7 +208,10 @@ pub fn export_gpx(tracks: &[Track], waypoints: &[Waypoint]) -> Result<String, Fo
             waypoint.lat_lon.lat, waypoint.lat_lon.lon
         ));
         if !waypoint.name.is_empty() {
-            out.push_str(&format!("    <name>{}</name>\n", escape_xml(&waypoint.name)));
+            out.push_str(&format!(
+                "    <name>{}</name>\n",
+                escape_xml(&waypoint.name)
+            ));
         }
         if let Some(description) = &waypoint.description {
             out.push_str(&format!("    <desc>{}</desc>\n", escape_xml(description)));
@@ -291,7 +288,8 @@ mod tests {
 
     #[test]
     fn test_parse_gpx_invalid() {
-        let result = parse_gpx("<gpx><trk><trkpt lat=\"notanumber\" lon=\"0\"></trkpt></trk></gpx>");
+        let result =
+            parse_gpx("<gpx><trk><trkpt lat=\"notanumber\" lon=\"0\"></trkpt></trk></gpx>");
         assert!(result.is_err());
     }
 }

@@ -164,8 +164,10 @@ mod tests {
 
     #[test]
     fn test_extractor_with_custom_config() {
-        let mut config = crate::AgentConfig::default();
-        config.min_toponym_length = 5;
+        let config = crate::AgentConfig {
+            min_toponym_length: 5,
+            ..Default::default()
+        };
         let extractor = ToponymExtractor::with_config(config);
         assert_eq!(extractor.config().min_toponym_length, 5);
     }

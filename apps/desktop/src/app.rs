@@ -16,8 +16,6 @@ pub struct KartaApp {
     pub tile_manager: TileManager,
     /// Состояние карты: центр, zoom.
     pub map_state: MapState,
-    /// Последняя позиция мыши (для drag-панорамирования).
-    pub last_mouse_pos: Option<egui::Pos2>,
     /// Загруженные текстуры тайлов для отрисовки.
     pub tiles_textures: HashMap<TileId, egui::TextureHandle>,
     /// Позиция курсора в географических координатах (для статусбара).
@@ -47,7 +45,6 @@ impl KartaApp {
         Self {
             tile_manager,
             map_state: MapState::new(),
-            last_mouse_pos: None,
             tiles_textures: HashMap::new(),
             cursor_lat_lon: None,
             show_grid: false,
@@ -58,10 +55,7 @@ impl KartaApp {
 
     /// Обрабатывает ввод: мышь (drag → pan, scroll → zoom) и клавиатуру.
     fn handle_input(&mut self, ui: &mut egui::Ui, viewport: egui::Rect) {
-        let vc = (
-            viewport.center().x as f64,
-            viewport.center().y as f64,
-        );
+        let vc = (viewport.center().x as f64, viewport.center().y as f64);
 
         // ── Колесо мыши → zoom к точке под курсором ──────────────────
         let scroll = ui.input(|i| i.smooth_scroll_delta().y);
@@ -133,8 +127,7 @@ impl eframe::App for KartaApp {
             egui::MenuBar::new().ui(ui, |ui| {
                 ui.menu_button("File", |ui| {
                     if ui.button("Exit").clicked() {
-                        ui.ctx()
-                            .send_viewport_cmd(egui::ViewportCommand::Close);
+                        ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
                     }
                 });
                 ui.menu_button("View", |ui| {
@@ -205,10 +198,7 @@ impl eframe::App for KartaApp {
                         "Загружено тайлов: {}",
                         self.tile_manager.loaded_count()
                     ));
-                    ui.label(format!(
-                        "В процессе: {}",
-                        self.tile_manager.pending_count()
-                    ));
+                    ui.label(format!("В процессе: {}", self.tile_manager.pending_count()));
                     ui.separator();
 
                     ui.label("Управление");
@@ -230,10 +220,7 @@ impl eframe::App for KartaApp {
             // Обновляем координаты курсора для статусбара.
             if let Some(hover) = ui.input(|i| i.pointer.hover_pos()) {
                 if viewport.contains(hover) {
-                    let vc = (
-                        viewport.center().x as f64,
-                        viewport.center().y as f64,
-                    );
+                    let vc = (viewport.center().x as f64, viewport.center().y as f64);
                     let mp = (hover.x as f64, hover.y as f64);
                     self.cursor_lat_lon = Some(self.map_state.screen_to_lat_lon(mp, vc));
                 }

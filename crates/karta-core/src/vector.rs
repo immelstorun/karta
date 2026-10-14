@@ -97,8 +97,16 @@ mod tests {
         let track = Track {
             name: "test".to_string(),
             points: vec![
-                TrackPoint { lat_lon: moscow(), elevation: None, time: None },
-                TrackPoint { lat_lon: spb(), elevation: None, time: None },
+                TrackPoint {
+                    lat_lon: moscow(),
+                    elevation: None,
+                    time: None,
+                },
+                TrackPoint {
+                    lat_lon: spb(),
+                    elevation: None,
+                    time: None,
+                },
             ],
         };
         let len = track.length_meters();

@@ -150,11 +150,7 @@ mod tests {
 
     #[test]
     fn test_correction_construction() {
-        let correction = Correction::new(
-            0,
-            LatLon::new(55.8000, 37.6200),
-            "точка попала в реку",
-        );
+        let correction = Correction::new(0, LatLon::new(55.8000, 37.6200), "точка попала в реку");
         assert_eq!(correction.original_index, 0);
         assert_eq!(correction.reason, "точка попала в реку");
         assert!(correction.timestamp.is_some());

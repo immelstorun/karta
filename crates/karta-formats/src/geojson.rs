@@ -77,10 +77,8 @@ pub fn parse_geojson(data: &str) -> Result<Vec<Track>, FormatError> {
             continue;
         }
 
-        let coordinates: Vec<Vec<f64>> = serde_json::from_value(
-            feature.geometry.coordinates,
-        )
-        .map_err(|e| FormatError::InvalidGeojson(format!("invalid coordinates: {}", e)))?;
+        let coordinates: Vec<Vec<f64>> = serde_json::from_value(feature.geometry.coordinates)
+            .map_err(|e| FormatError::InvalidGeojson(format!("invalid coordinates: {}", e)))?;
 
         let name = feature
             .properties
@@ -92,12 +90,12 @@ pub fn parse_geojson(data: &str) -> Result<Vec<Track>, FormatError> {
         let points: Vec<karta_core::vector::TrackPoint> = coordinates
             .iter()
             .map(|c| {
-                let lat = *c.get(1).ok_or_else(|| {
-                    FormatError::InvalidGeojson("missing latitude".to_string())
-                })?;
-                let lon = *c.get(0).ok_or_else(|| {
-                    FormatError::InvalidGeojson("missing longitude".to_string())
-                })?;
+                let lat = *c
+                    .get(1)
+                    .ok_or_else(|| FormatError::InvalidGeojson("missing latitude".to_string()))?;
+                let lon = *c
+                    .first()
+                    .ok_or_else(|| FormatError::InvalidGeojson("missing longitude".to_string()))?;
                 Ok(karta_core::vector::TrackPoint {
                     lat_lon: karta_core::coords::LatLon::new(lat, lon),
                     elevation: c.get(2).copied(),

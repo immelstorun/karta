@@ -149,7 +149,11 @@ mod tests {
     #[test]
     fn test_build_tile_url() {
         let spec = test_spec();
-        let tile = TileId { x: 3, y: 5, zoom: 7 };
+        let tile = TileId {
+            x: 3,
+            y: 5,
+            zoom: 7,
+        };
         let url = build_tile_url(&spec, &tile);
         assert_eq!(url, "https://tile.example.org/7/3/5.png");
     }
@@ -158,7 +162,11 @@ mod tests {
     fn test_build_tile_url_tms_flip() {
         let mut spec = test_spec();
         spec.tms_y_flip = true;
-        let tile = TileId { x: 3, y: 5, zoom: 7 };
+        let tile = TileId {
+            x: 3,
+            y: 5,
+            zoom: 7,
+        };
         let url = build_tile_url(&spec, &tile);
         // TMS y = (2^7 - 1) - 5 = 127 - 5 = 122
         assert_eq!(url, "https://tile.example.org/7/3/122.png");

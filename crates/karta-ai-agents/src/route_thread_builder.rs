@@ -87,10 +87,7 @@ mod tests {
     #[test]
     fn test_build_thread_stub() {
         let builder = RouteThreadBuilder::new();
-        let points = vec![
-            LatLon::new(55.7558, 37.6173),
-            LatLon::new(55.8500, 37.7000),
-        ];
+        let points = vec![LatLon::new(55.7558, 37.6173), LatLon::new(55.8500, 37.7000)];
         let thread = builder.build_thread(&points);
         assert!(thread.is_empty());
     }

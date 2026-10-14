@@ -13,8 +13,8 @@
 //! - Геокодирование через онлайн-сервисы (Nominatim и др.)
 //! - LLM-интеграция для улучшения качества извлечения
 
-pub mod toponym_extractor;
 pub mod route_thread_builder;
+pub mod toponym_extractor;
 pub mod validator;
 
 /// Конфигурация AI-агентов.

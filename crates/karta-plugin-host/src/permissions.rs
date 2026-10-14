@@ -105,9 +105,7 @@ pub fn matches_pattern(pattern: &str, s: &str) -> bool {
         match (p.first(), s.first()) {
             (None, None) => true,
             (None, Some(_)) => false,
-            (Some(b'*'), _) => {
-                helper(&p[1..], s) || (!s.is_empty() && helper(p, &s[1..]))
-            }
+            (Some(b'*'), _) => helper(&p[1..], s) || (!s.is_empty() && helper(p, &s[1..])),
             (Some(b'?'), Some(_)) => helper(&p[1..], &s[1..]),
             (Some(pc), Some(sc)) if pc == sc => helper(&p[1..], &s[1..]),
             _ => false,

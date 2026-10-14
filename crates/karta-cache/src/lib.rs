@@ -10,7 +10,7 @@ pub mod memory;
 pub mod sas_cache;
 pub mod traits;
 
-pub use memory::MemoryCache;
 pub use mbtiles::MbtilesCache;
+pub use memory::MemoryCache;
 pub use sas_cache::SasCache;
 pub use traits::{CacheError, CacheType, TileCache};

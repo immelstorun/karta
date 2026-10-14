@@ -40,12 +40,7 @@ impl TileCache for MemoryCache {
         Ok(cache.get(&(layer.to_string(), *tile)).cloned())
     }
 
-    async fn put_tile(
-        &self,
-        layer: &str,
-        tile: &TileId,
-        data: &[u8],
-    ) -> Result<(), CacheError> {
+    async fn put_tile(&self, layer: &str, tile: &TileId, data: &[u8]) -> Result<(), CacheError> {
         let mut cache = self
             .cache
             .lock()
@@ -75,7 +70,11 @@ mod tests {
     #[tokio::test]
     async fn test_memory_cache_put_get_delete() {
         let cache = MemoryCache::default();
-        let tile = TileId { x: 1, y: 2, zoom: 3 };
+        let tile = TileId {
+            x: 1,
+            y: 2,
+            zoom: 3,
+        };
         let data = b"tile data".to_vec();
 
         cache.put_tile("osm", &tile, &data).await.unwrap();
@@ -90,9 +89,21 @@ mod tests {
     #[tokio::test]
     async fn test_memory_cache_lru_eviction() {
         let cache = MemoryCache::with_capacity(2);
-        let tile1 = TileId { x: 1, y: 1, zoom: 1 };
-        let tile2 = TileId { x: 2, y: 2, zoom: 1 };
-        let tile3 = TileId { x: 3, y: 3, zoom: 1 };
+        let tile1 = TileId {
+            x: 1,
+            y: 1,
+            zoom: 1,
+        };
+        let tile2 = TileId {
+            x: 2,
+            y: 2,
+            zoom: 1,
+        };
+        let tile3 = TileId {
+            x: 3,
+            y: 3,
+            zoom: 1,
+        };
 
         cache.put_tile("osm", &tile1, b"a").await.unwrap();
         cache.put_tile("osm", &tile2, b"b").await.unwrap();
@@ -108,7 +119,11 @@ mod tests {
     #[tokio::test]
     async fn test_memory_cache_layers_are_independent() {
         let cache = MemoryCache::default();
-        let tile = TileId { x: 1, y: 1, zoom: 1 };
+        let tile = TileId {
+            x: 1,
+            y: 1,
+            zoom: 1,
+        };
 
         cache.put_tile("osm", &tile, b"osm").await.unwrap();
         assert!(cache.get_tile("sat", &tile).await.unwrap().is_none());

@@ -109,11 +109,6 @@ impl TileManager {
         self.pending_tiles.len()
     }
 
-    /// Статистика: (загрузок по сети, попаданий в кэш, ошибок).
-    pub fn stats(&self) -> (u64, u64, u64) {
-        (self.network_fetches, self.cache_hits, self.errors)
-    }
-
     /// Возвращает загруженный тайл из памяти, если он есть.
     pub fn get_tile(&mut self, tile: &TileId) -> Option<&DynamicImage> {
         // Обновляем порядок доступа для LRU.
@@ -131,21 +126,19 @@ impl TileManager {
         let cache_data = self.runtime.block_on(self.sas_cache.get_tile(LAYER, tile));
 
         match cache_data {
-            Ok(Some(data)) => {
-                match image::load_from_memory(&data) {
-                    Ok(img) => {
-                        self.cache_hits += 1;
-                        self.loaded_tiles.insert(*tile, img);
-                        self.tile_order.push(*tile);
-                        self.evict_old_tiles();
-                        true
-                    }
-                    Err(e) => {
-                        tracing::warn!(?tile, error = %e, "Не удалось декодировать тайл из кэша");
-                        false
-                    }
+            Ok(Some(data)) => match image::load_from_memory(&data) {
+                Ok(img) => {
+                    self.cache_hits += 1;
+                    self.loaded_tiles.insert(*tile, img);
+                    self.tile_order.push(*tile);
+                    self.evict_old_tiles();
+                    true
                 }
-            }
+                Err(e) => {
+                    tracing::warn!(?tile, error = %e, "Не удалось декодировать тайл из кэша");
+                    false
+                }
+            },
             Ok(None) => false,
             Err(e) => {
                 tracing::warn!(?tile, error = %e, "Ошибка чтения тайла из кэша");
@@ -196,8 +189,7 @@ impl TileManager {
         let tile_id = *tile;
 
         self.runtime.spawn(async move {
-            let response =
-                fetch_and_cache_tile(&client, &sas_cache, tile_id, &url).await;
+            let response = fetch_and_cache_tile(&client, &sas_cache, tile_id, &url).await;
             let _ = sender.send(response);
         });
     }

@@ -9,8 +9,8 @@
 //! - GeoTIFF — геопривязанные растровые карты
 
 pub mod geojson;
-pub mod gpx;
 pub mod geotiff;
+pub mod gpx;
 pub mod jnx;
 pub mod kml;
 pub mod mbtiles;

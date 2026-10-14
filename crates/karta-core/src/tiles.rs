@@ -92,7 +92,11 @@ mod tests {
 
     #[test]
     fn test_tile_roundtrip() {
-        let original = TileId { x: 3, y: 5, zoom: 7 };
+        let original = TileId {
+            x: 3,
+            y: 5,
+            zoom: 7,
+        };
         let (lat, lon) = tile_to_lat_lon(&original);
         let back = lat_lon_to_tile(lat, lon, original.zoom);
         assert_eq!(original, back);
@@ -107,7 +111,11 @@ mod tests {
 
     #[test]
     fn test_quadkey() {
-        let tile = TileId { x: 3, y: 5, zoom: 3 };
+        let tile = TileId {
+            x: 3,
+            y: 5,
+            zoom: 3,
+        };
         assert_eq!(quadkey(&tile), "213");
     }
 }

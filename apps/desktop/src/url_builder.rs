@@ -27,17 +27,16 @@ impl UrlTemplate {
         }
     }
 
-    /// Создаёт шаблон с поддоменами для `{s}`.
-    pub fn with_subdomains(template: &str, subdomains: &[&str]) -> Self {
-        Self {
-            template: template.to_string(),
-            subdomains: subdomains.iter().map(|s| s.to_string()).collect(),
-        }
-    }
-
     /// Стандартный шаблон OpenStreetMap.
     pub fn osm_default() -> Self {
         Self::new("https://tile.openstreetmap.org/{z}/{x}/{y}.png")
+    }
+
+    /// Устанавливает поддомены для `{s}`.
+    /// TODO(Phase 1): будет вызываться при загрузке TOML-слоя с поддоменами.
+    #[cfg_attr(not(test), expect(dead_code))]
+    pub fn set_subdomains(&mut self, subdomains: &[&str]) {
+        self.subdomains = subdomains.iter().map(|s| s.to_string()).collect();
     }
 
     /// Строит URL для заданного тайла.
@@ -71,28 +70,40 @@ mod tests {
     #[test]
     fn test_build_url() {
         let template = UrlTemplate::osm_default();
-        let tile = TileId { x: 1, y: 2, zoom: 3 };
+        let tile = TileId {
+            x: 1,
+            y: 2,
+            zoom: 3,
+        };
         let url = template.build_url(&tile);
         assert_eq!(url, "https://tile.openstreetmap.org/3/1/2.png");
     }
 
     #[test]
     fn test_subdomains() {
-        let template = UrlTemplate::with_subdomains(
-            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-            &["a", "b", "c"],
-        );
-        let tile = TileId { x: 1, y: 2, zoom: 3 };
+        let mut template = UrlTemplate::new("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
+        template.set_subdomains(&["a", "b", "c"]);
+        let tile = TileId {
+            x: 1,
+            y: 2,
+            zoom: 3,
+        };
         let url = template.build_url(&tile);
-        assert!(url.starts_with("https://a.tile.")
-            || url.starts_with("https://b.tile.")
-            || url.starts_with("https://c.tile."));
+        assert!(
+            url.starts_with("https://a.tile.")
+                || url.starts_with("https://b.tile.")
+                || url.starts_with("https://c.tile.")
+        );
     }
 
     #[test]
     fn test_quadkey_substitution() {
         let template = UrlTemplate::new("https://example.com/{q}.png");
-        let tile = TileId { x: 3, y: 5, zoom: 3 };
+        let tile = TileId {
+            x: 3,
+            y: 5,
+            zoom: 3,
+        };
         let url = template.build_url(&tile);
         assert_eq!(url, "https://example.com/213.png");
     }

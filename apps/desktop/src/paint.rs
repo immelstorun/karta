@@ -65,7 +65,7 @@ pub fn sync_textures(app: &mut KartaApp, ctx: &egui::Context) {
     let tiles_textures = &mut app.tiles_textures;
 
     for tile in tile_manager.loaded_tile_ids() {
-        if !tiles_textures.contains_key(&tile) {
+        if let std::collections::hash_map::Entry::Vacant(e) = tiles_textures.entry(tile) {
             if let Some(img) = tile_manager.get_tile(&tile) {
                 let size = [img.width() as usize, img.height() as usize];
                 let rgba = img.to_rgba8();
@@ -75,7 +75,7 @@ pub fn sync_textures(app: &mut KartaApp, ctx: &egui::Context) {
                     color_image,
                     egui::TextureOptions::default(),
                 );
-                tiles_textures.insert(tile, texture);
+                e.insert(texture);
             }
         }
     }
@@ -126,12 +126,7 @@ fn compute_visible_tiles(map_state: &MapState, viewport: Rect) -> Vec<TileId> {
 }
 
 /// Вычисляет экранный прямоугольник тайла.
-fn tile_screen_rect(
-    map_state: &MapState,
-    tile: &TileId,
-    viewport: Rect,
-    scale: f64,
-) -> Rect {
+fn tile_screen_rect(map_state: &MapState, tile: &TileId, viewport: Rect, scale: f64) -> Rect {
     let tile_screen_size = TILE_SIZE * scale;
     let (cx, cy) = map_state.lat_lon_to_world(&map_state.center);
     let viewport_center = viewport.center();
@@ -171,25 +166,17 @@ fn paint_grid(painter: &egui::Painter, map_state: &MapState, viewport: Rect) {
         0.01
     };
 
-    let vc = (
-        viewport.center().x as f64,
-        viewport.center().y as f64,
-    );
+    let vc = (viewport.center().x as f64, viewport.center().y as f64);
 
     // Географические границы видимой области.
-    let top_left =
-        map_state.screen_to_lat_lon((viewport.left() as f64, viewport.top() as f64), vc);
-    let bottom_right = map_state.screen_to_lat_lon(
-        (viewport.right() as f64, viewport.bottom() as f64),
-        vc,
-    );
+    let top_left = map_state.screen_to_lat_lon((viewport.left() as f64, viewport.top() as f64), vc);
+    let bottom_right =
+        map_state.screen_to_lat_lon((viewport.right() as f64, viewport.bottom() as f64), vc);
 
     // Вертикальные линии (меридианы).
     let mut lon = (top_left.lon / step).floor() * step;
     while lon <= bottom_right.lon {
-        let x = map_state
-            .lat_lon_to_screen(&LatLon::new(0.0, lon), vc)
-            .0 as f32;
+        let x = map_state.lat_lon_to_screen(&LatLon::new(0.0, lon), vc).0 as f32;
         if x >= viewport.left() && x <= viewport.right() {
             painter.line_segment(
                 [
@@ -205,9 +192,7 @@ fn paint_grid(painter: &egui::Painter, map_state: &MapState, viewport: Rect) {
     // Горизонтальные линии (параллели).
     let mut lat = (top_left.lat / step).floor() * step;
     while lat >= bottom_right.lat {
-        let y = map_state
-            .lat_lon_to_screen(&LatLon::new(lat, 0.0), vc)
-            .1 as f32;
+        let y = map_state.lat_lon_to_screen(&LatLon::new(lat, 0.0), vc).1 as f32;
         if y >= viewport.top() && y <= viewport.bottom() {
             painter.line_segment(
                 [

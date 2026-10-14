@@ -26,7 +26,9 @@ impl RouteDb {
     ///
     /// TODO: инициализация SQLite схемы (таблицы routes, waypoints, ratings).
     pub fn new(db_path: impl Into<PathBuf>) -> Self {
-        Self { db_path: db_path.into() }
+        Self {
+            db_path: db_path.into(),
+        }
     }
 
     /// Возвращает путь к файлу базы данных.
@@ -42,6 +44,9 @@ mod tests {
     #[test]
     fn test_route_db_creation() {
         let db = RouteDb::new("/tmp/test-routes.sqlite");
-        assert_eq!(db.db_path(), std::path::Path::new("/tmp/test-routes.sqlite"));
+        assert_eq!(
+            db.db_path(),
+            std::path::Path::new("/tmp/test-routes.sqlite")
+        );
     }
 }

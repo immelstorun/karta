@@ -84,8 +84,14 @@ impl Route {
             max_lon = max_lon.max(lon);
         }
         Some((
-            LatLon { lat: min_lat, lon: min_lon },
-            LatLon { lat: max_lat, lon: max_lon },
+            LatLon {
+                lat: min_lat,
+                lon: min_lon,
+            },
+            LatLon {
+                lat: max_lat,
+                lon: max_lon,
+            },
         ))
     }
 }
@@ -95,11 +101,19 @@ mod tests {
     use super::*;
 
     fn moscow() -> TrackPoint {
-        TrackPoint { lat_lon: LatLon::new(55.7558, 37.6173), elevation: None, time: None }
+        TrackPoint {
+            lat_lon: LatLon::new(55.7558, 37.6173),
+            elevation: None,
+            time: None,
+        }
     }
 
     fn spb() -> TrackPoint {
-        TrackPoint { lat_lon: LatLon::new(59.9343, 30.3351), elevation: None, time: None }
+        TrackPoint {
+            lat_lon: LatLon::new(59.9343, 30.3351),
+            elevation: None,
+            time: None,
+        }
     }
 
     #[test]

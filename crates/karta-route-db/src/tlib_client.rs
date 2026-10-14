@@ -43,7 +43,9 @@ impl TlibClient {
 
     /// Создаёт клиент с кастомным базовым URL (для тестов).
     pub fn with_base_url(base_url: impl Into<String>) -> Self {
-        Self { base_url: base_url.into() }
+        Self {
+            base_url: base_url.into(),
+        }
     }
 
     /// Возвращает базовый URL.
@@ -89,13 +91,19 @@ mod tests {
     #[tokio::test]
     async fn test_search_reports_not_implemented() {
         let client = TlibClient::new();
-        assert!(matches!(client.search_reports("Алтай").await, Err(Error::NotImplemented)));
+        assert!(matches!(
+            client.search_reports("Алтай").await,
+            Err(Error::NotImplemented)
+        ));
     }
 
     #[tokio::test]
     async fn test_get_report_not_implemented() {
         let client = TlibClient::new();
-        assert!(matches!(client.get_report("123").await, Err(Error::NotImplemented)));
+        assert!(matches!(
+            client.get_report("123").await,
+            Err(Error::NotImplemented)
+        ));
     }
 
     #[test]

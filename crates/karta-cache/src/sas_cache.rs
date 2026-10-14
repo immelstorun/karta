@@ -56,7 +56,11 @@ impl SasCache {
     }
 
     /// Читает тайл с диска, обходя `.tne`-маркеры и расширения файлов.
-    fn read_tile_from_disk(&self, layer: &str, tile: &TileId) -> Result<Option<Vec<u8>>, CacheError> {
+    fn read_tile_from_disk(
+        &self,
+        layer: &str,
+        tile: &TileId,
+    ) -> Result<Option<Vec<u8>>, CacheError> {
         for ext in ["png", "jpg", "jpeg"] {
             let path = self.tile_path(layer, tile, ext);
             if let Ok(data) = std::fs::read(&path) {
@@ -95,12 +99,7 @@ impl TileCache for SasCache {
         self.read_tile_from_disk(layer, tile)
     }
 
-    async fn put_tile(
-        &self,
-        layer: &str,
-        tile: &TileId,
-        data: &[u8],
-    ) -> Result<(), CacheError> {
+    async fn put_tile(&self, layer: &str, tile: &TileId, data: &[u8]) -> Result<(), CacheError> {
         // Default extension for SAS.Planet cache tiles is png.
         self.write_tile_to_disk(layer, tile, "png", data)?;
         // Writing the tile invalidates any "not exists" marker.
@@ -155,14 +154,24 @@ mod tests {
     #[tokio::test]
     async fn test_sas_cache_put_get_delete() {
         let (cache, _dir) = temp_cache();
-        let tile = TileId { x: 1234, y: 5678, zoom: 10 };
+        let tile = TileId {
+            x: 1234,
+            y: 5678,
+            zoom: 10,
+        };
         let data = b"fake png data".to_vec();
 
-        cache.put_tile("osm", &tile, &data).await.expect("put failed");
+        cache
+            .put_tile("osm", &tile, &data)
+            .await
+            .expect("put failed");
         let loaded = cache.get_tile("osm", &tile).await.expect("get failed");
         assert_eq!(loaded, Some(data));
 
-        cache.delete_tile("osm", &tile).await.expect("delete failed");
+        cache
+            .delete_tile("osm", &tile)
+            .await
+            .expect("delete failed");
         let loaded = cache.get_tile("osm", &tile).await.expect("get failed");
         assert_eq!(loaded, None);
     }
@@ -170,7 +179,11 @@ mod tests {
     #[tokio::test]
     async fn test_sas_cache_tne_marker() {
         let (cache, _dir) = temp_cache();
-        let tile = TileId { x: 1, y: 2, zoom: 3 };
+        let tile = TileId {
+            x: 1,
+            y: 2,
+            zoom: 3,
+        };
 
         // Simulate writing a .tne marker (tile not exists).
         let tne_path = cache.tne_path("osm", &tile);
@@ -186,7 +199,11 @@ mod tests {
     fn test_tile_path_format() {
         let dir = tempfile::tempdir().unwrap();
         let cache = SasCache::new(dir.path());
-        let tile = TileId { x: 1234, y: 567, zoom: 10 };
+        let tile = TileId {
+            x: 1234,
+            y: 567,
+            zoom: 10,
+        };
         let path = cache.tile_path("osm", &tile, "png");
         let expected = dir
             .path()

@@ -67,11 +67,7 @@ impl TileCache for MbtilesCache {
         let conn = self.connection();
         let mut stmt = conn
             .prepare("SELECT tile_data FROM tiles WHERE zoom_level = ?1 AND tile_column = ?2 AND tile_row = ?3")?;
-        let mut rows = stmt.query([
-            (tile.zoom as i64),
-            (tile.x as i64),
-            (tms_row as i64),
-        ])?;
+        let mut rows = stmt.query([(tile.zoom as i64), (tile.x as i64), (tms_row as i64)])?;
         if let Some(row) = rows.next()? {
             let data: Vec<u8> = row.get(0)?;
             let _ = layer; // MBTiles is a single-layer format; layer name is ignored.
@@ -80,12 +76,7 @@ impl TileCache for MbtilesCache {
         Ok(None)
     }
 
-    async fn put_tile(
-        &self,
-        layer: &str,
-        tile: &TileId,
-        data: &[u8],
-    ) -> Result<(), CacheError> {
+    async fn put_tile(&self, layer: &str, tile: &TileId, data: &[u8]) -> Result<(), CacheError> {
         let _ = layer; // MBTiles is a single-layer format; layer name is ignored.
         let max_y = (1u64 << tile.zoom) - 1;
         let tms_row = max_y - tile.y as u64;
@@ -109,11 +100,7 @@ impl TileCache for MbtilesCache {
         let conn = self.connection();
         conn.execute(
             "DELETE FROM tiles WHERE zoom_level = ?1 AND tile_column = ?2 AND tile_row = ?3",
-            rusqlite::params![
-                tile.zoom as i64,
-                tile.x as i64,
-                tms_row as i64
-            ],
+            rusqlite::params![tile.zoom as i64, tile.x as i64, tms_row as i64],
         )?;
         Ok(())
     }
@@ -134,14 +121,24 @@ mod tests {
         let db_path = dir.path().join("test.mbtiles");
         let cache = MbtilesCache::create(&db_path).expect("failed to create mbtiles");
 
-        let tile = TileId { x: 5, y: 10, zoom: 7 };
+        let tile = TileId {
+            x: 5,
+            y: 10,
+            zoom: 7,
+        };
         let data = b"tile bytes".to_vec();
 
-        cache.put_tile("layer", &tile, &data).await.expect("put failed");
+        cache
+            .put_tile("layer", &tile, &data)
+            .await
+            .expect("put failed");
         let loaded = cache.get_tile("layer", &tile).await.expect("get failed");
         assert_eq!(loaded, Some(data.clone()));
 
-        cache.delete_tile("layer", &tile).await.expect("delete failed");
+        cache
+            .delete_tile("layer", &tile)
+            .await
+            .expect("delete failed");
         let loaded = cache.get_tile("layer", &tile).await.expect("get failed");
         assert_eq!(loaded, None);
     }
@@ -152,7 +149,11 @@ mod tests {
         let db_path = dir.path().join("test.mbtiles");
         let cache = MbtilesCache::create(&db_path).expect("failed to create mbtiles");
 
-        let tile = TileId { x: 3, y: 3, zoom: 3 };
+        let tile = TileId {
+            x: 3,
+            y: 3,
+            zoom: 3,
+        };
         let data = b"data".to_vec();
         cache.put_tile("layer", &tile, &data).await.unwrap();
 
@@ -161,9 +162,7 @@ mod tests {
         let mut stmt = conn
             .prepare("SELECT tile_row FROM tiles")
             .expect("prepare failed");
-        let tms_row: i64 = stmt
-            .query_row([], |row| row.get(0))
-            .expect("query failed");
+        let tms_row: i64 = stmt.query_row([], |row| row.get(0)).expect("query failed");
         assert_eq!(tms_row, 4);
     }
 }
