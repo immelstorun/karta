@@ -1,0 +1,15 @@
+[package]
+name = "karta-ai-agents"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "AI agents for route building from text descriptions"
+
+[dependencies]
+karta-core = { workspace = true }
+karta-route-db = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+chrono = { workspace = true }

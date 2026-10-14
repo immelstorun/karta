@@ -1,0 +1,73 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/karta-core",
+    "crates/karta-net",
+    "crates/karta-cache",
+    "crates/karta-render",
+    "crates/karta-plugin-host",
+    "crates/karta-route-db",
+    "crates/karta-ai-agents",
+    "crates/karta-formats",
+    "apps/desktop",
+    "apps/cli",
+]
+
+[workspace.package]
+version = "0.0.1"
+edition = "2021"
+license = "GPL-3.0-or-later"
+
+[workspace.dependencies]
+# Internal crates
+karta-core = { path = "crates/karta-core" }
+karta-net = { path = "crates/karta-net" }
+karta-cache = { path = "crates/karta-cache" }
+karta-render = { path = "crates/karta-render" }
+karta-plugin-host = { path = "crates/karta-plugin-host" }
+karta-route-db = { path = "crates/karta-route-db" }
+karta-ai-agents = { path = "crates/karta-ai-agents" }
+karta-formats = { path = "crates/karta-formats" }
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# HTTP client
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "gzip", "brotli"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.9"
+
+# Error handling
+anyhow = "1"
+thiserror = "2"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# Async traits
+async-trait = "0.1"
+
+# LRU cache
+lru = "0.12"
+
+# GUI (desktop)
+eframe = "0.36"
+egui = "0.36"
+
+# CLI
+clap = { version = "4", features = ["derive"] }
+
+# WASM runtime (plugin host)
+wasmtime = "37"
+
+# Image handling
+image = "0.25"
+
+# Geo
+geo-types = "0.7"
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }

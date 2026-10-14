@@ -1,0 +1,21 @@
+[package]
+name = "karta-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "karta CLI tools: cache management, tile downloading, format conversion"
+
+[[bin]]
+name = "karta-cli"
+path = "src/main.rs"
+
+[dependencies]
+karta-core = { workspace = true }
+karta-net = { workspace = true }
+karta-cache = { workspace = true }
+karta-formats = { workspace = true }
+clap = { version = "4", features = ["derive"] }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }

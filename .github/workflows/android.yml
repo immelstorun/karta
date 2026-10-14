@@ -1,0 +1,81 @@
+name: Android CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-34 build-tools;34.0.0 ndk;27.0.12077973'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          key: android
+
+      - name: Build Rust library for Android
+        run: |
+          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.0.12077973
+          
+          # Configure cargo for Android targets
+          mkdir -p ~/.cargo
+          cat >> ~/.cargo/config.toml << EOF
+          [target.aarch64-linux-android]
+          linker = "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang"
+          
+          [target.armv7-linux-androideabi]
+          linker = "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang"
+          
+          [target.i686-linux-android]
+          linker = "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android24-clang"
+          
+          [target.x86_64-linux-android]
+          linker = "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android24-clang"
+          EOF
+
+          # Build for aarch64 (primary Android target)
+          cargo build --release --target aarch64-linux-android -p karta-desktop
+
+      - name: Build Android APK
+        run: |
+          cd apps/android
+          chmod +x gradlew
+          ./gradlew assembleRelease
+          
+          # Copy APK to artifacts
+          cp app/build/outputs/apk/release/app-release-unsigned.apk ../../../karta-android.apk
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: karta-android
+          path: karta-android.apk
+          retention-days: 30

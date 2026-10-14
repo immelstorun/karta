@@ -1,0 +1,4 @@
+#!/bin/sh
+# Gradle wrapper stub - in CI, use ./gradlew directly
+
+exec gradle "$@"

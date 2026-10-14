@@ -1,0 +1,12 @@
+[package]
+name = "karta-render"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Map rendering: wgpu-based tile and vector rendering"
+
+[dependencies]
+karta-core = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+image = { workspace = true }

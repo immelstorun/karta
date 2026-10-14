@@ -1,0 +1,16 @@
+[package]
+name = "karta-net"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Network layer: tile fetching, HTTP client management, retry logic"
+
+[dependencies]
+karta-core = { workspace = true }
+tokio = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+bytes = "1"
+async-trait = { workspace = true }

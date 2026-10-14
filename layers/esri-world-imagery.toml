@@ -1,0 +1,10 @@
+[layer]
+id = "esri-world-imagery"
+name = "ESRI World Imagery"
+description = "Спутниковые снимки ESRI"
+url_template = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+min_zoom = 0
+max_zoom = 19
+tile_size = 256
+attribution = "Esri, Maxar, Earthstar Geographics"
+cache_type = "sas-planet"

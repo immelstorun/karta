@@ -1,0 +1,10 @@
+[layer]
+id = "opentopomap"
+name = "OpenTopoMap"
+description = "Топографическая карта на основе OSM данных"
+url_template = "https://tile.opentopomap.org/{z}/{x}/{y}.png"
+min_zoom = 0
+max_zoom = 17
+tile_size = 256
+attribution = "© OpenTopoMap (CC-BY-SA)"
+cache_type = "sas-planet"

@@ -1,0 +1,10 @@
+[layer]
+id = "osm-standard"
+name = "OpenStreetMap Standard"
+description = "Стандартный стиль OpenStreetMap"
+url_template = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+min_zoom = 0
+max_zoom = 19
+tile_size = 256
+attribution = "© OpenStreetMap contributors"
+cache_type = "sas-planet"

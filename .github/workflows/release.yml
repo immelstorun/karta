@@ -1,0 +1,86 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create-release.outputs.id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create Release
+        id: create-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          draft: true
+          prerelease: true
+
+  build-linux:
+    needs: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+      - name: Build
+        run: cargo build --release -p karta-desktop
+      - name: Package
+        run: |
+          cd target/release
+          tar -czf ../../karta-linux-x86_64.tar.gz karta
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: karta-linux-x86_64.tar.gz
+
+  build-windows:
+    needs: create-release
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build
+        run: cargo build --release -p karta-desktop
+      - name: Package
+        run: |
+          cd target/release
+          7z a ../../karta-windows-x86_64.zip karta.exe
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: karta-windows-x86_64.zip
+
+  build-macos:
+    needs: create-release
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        target: [x86_64-apple-darwin, aarch64-apple-darwin]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }} -p karta-desktop
+      - name: Package
+        run: |
+          cd target/${{ matrix.target }}/release
+          tar -czf ../../../karta-macos-${{ matrix.target }}.tar.gz karta
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: karta-macos-${{ matrix.target }}.tar.gz

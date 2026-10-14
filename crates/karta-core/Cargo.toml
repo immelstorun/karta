@@ -1,0 +1,13 @@
+[package]
+name = "karta-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Core geo-math, tile calculations, projections, and vector data types for karta"
+
+[dependencies]
+serde = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+geo-types = { workspace = true }
+chrono = { workspace = true }

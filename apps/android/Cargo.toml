@@ -1,0 +1,42 @@
+# Отдельный (standalone) workspace: НЕ входит в members корневого
+# workspace karta и собирается независимо для android-target.
+#
+# Наследование `workspace = true` резолвится локально, поэтому
+# [workspace.package] / [workspace.dependencies] дублируют значения
+# корневого workspace (версии синхронизируются вручную).
+
+[workspace]
+members = ["."]
+
+[workspace.package]
+version = "0.0.1"
+edition = "2021"
+license = "GPL-3.0-or-later"
+
+[workspace.dependencies]
+karta-core = { path = "../../crates/karta-core" }
+karta-net = { path = "../../crates/karta-net" }
+karta-cache = { path = "../../crates/karta-cache" }
+eframe = "0.36"
+egui = "0.36"
+tracing = "0.1"
+
+[package]
+name = "karta-android-lib"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "karta android library - JNI wrapper around the egui app"
+
+[lib]
+name = "karta"
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[dependencies]
+karta-core = { workspace = true }
+karta-net = { workspace = true }
+karta-cache = { workspace = true }
+eframe = { workspace = true }
+egui = { workspace = true }
+tracing = { workspace = true }

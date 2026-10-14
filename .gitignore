@@ -1,0 +1,36 @@
+# Rust
+/target/
+**/*.rs.bk
+*.pdb
+
+# Android (apps/android — отдельный cargo-workspace)
+apps/android/target/
+apps/android/.gradle/
+apps/android/.cxx/
+apps/android/build/
+apps/android/app/build/
+apps/android/local.properties
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# karta cache (dev)
+/cache/
+*.mbtiles
+
+# Build artifacts
+*.apk
+*.aab
+*.exe
+*.dmg
+*.AppImage
+*.deb
+*.rpm
