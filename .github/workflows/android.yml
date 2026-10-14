@@ -9,6 +9,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/27.0.12077973
 
 jobs:
   build-android:
@@ -20,7 +21,7 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
+          targets: aarch64-linux-android
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -30,52 +31,45 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          packages: 'platforms;android-34 build-tools;34.0.0 ndk;27.0.12077973'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - name: Install NDK
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "ndk;27.0.12077973" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          key: android
+          key: android-aarch64
+          workspaces: "apps/android -> target"
 
-      - name: Build Rust library for Android
+      - name: Build Rust library for Android (aarch64)
+        working-directory: apps/android
+        env:
+          CC_aarch64_linux_android: ${{ env.ANDROID_NDK_HOME }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang
+          CXX_aarch64_linux_android: ${{ env.ANDROID_NDK_HOME }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++
+          AR_aarch64_linux_android: ${{ env.ANDROID_NDK_HOME }}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+          RANLIB_aarch64_linux_android: ${{ env.ANDROID_NDK_HOME }}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+          CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER: ${{ env.ANDROID_NDK_HOME }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang
         run: |
-          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.0.12077973
-          
-          # Configure cargo for Android targets
-          mkdir -p ~/.cargo
-          cat >> ~/.cargo/config.toml << EOF
-          [target.aarch64-linux-android]
-          linker = "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang"
-          
-          [target.armv7-linux-androideabi]
-          linker = "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang"
-          
-          [target.i686-linux-android]
-          linker = "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android24-clang"
-          
-          [target.x86_64-linux-android]
-          linker = "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android24-clang"
-          EOF
+          mkdir -p app/src/main/jniLibs/arm64-v8a
+          cargo build --release --target aarch64-linux-android
+          cp target/aarch64-linux-android/release/libkarta.so app/src/main/jniLibs/arm64-v8a/
 
-          # Build for aarch64 (primary Android target)
-          cargo build --release --target aarch64-linux-android -p karta-desktop
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Build Android APK
+        working-directory: apps/android
         run: |
-          cd apps/android
-          chmod +x gradlew
-          ./gradlew assembleRelease
-          
-          # Copy APK to artifacts
-          cp app/build/outputs/apk/release/app-release-unsigned.apk ../../../karta-android.apk
+          # Gradle wrapper (stub) calls system gradle; setup-gradle installs it.
+          ./gradlew assembleDebug --no-daemon --stacktrace || gradle assembleDebug --no-daemon
+          ls -la app/build/outputs/apk/debug/ || true
 
-      - name: Upload artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: karta-android
-          path: karta-android.apk
+          name: karta-android-apk
+          path: apps/android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
+          if-no-files-found: warn
