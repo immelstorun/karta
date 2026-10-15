@@ -249,7 +249,15 @@ async fn fetch_and_cache_tile(
                     return TileResponse::Error(tile, format!("Не удалось прочитать тело: {}", e))
                 }
             },
-            Err(e) => return TileResponse::Error(tile, format!("HTTP статус ошибки: {}", e)),
+            Err(e) => {
+                // 404 — тайл не существует, записываем .tne маркер.
+                if e.status() == Some(reqwest::StatusCode::NOT_FOUND) {
+                    if let Err(e) = sas_cache.put_tne_marker(layer_name, &tile) {
+                        tracing::warn!(?tile, error = %e, "Не удалось записать .tne маркер");
+                    }
+                }
+                return TileResponse::Error(tile, format!("HTTP статус ошибки: {}", e));
+            }
         },
         Err(e) => return TileResponse::Error(tile, format!("Ошибка сети: {}", e)),
     };

@@ -55,6 +55,23 @@ impl SasCache {
         Ok(())
     }
 
+    /// Записывает `.tne`-маркер (тайл не существует).
+    pub fn put_tne_marker(&self, layer: &str, tile: &TileId) -> Result<(), CacheError> {
+        let tne_path = self.tne_path(layer, tile);
+        if let Some(parent) = tne_path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| {
+                CacheError::DirectoryNotFound(format!("{}: {}", parent.display(), e))
+            })?;
+        }
+        // Содержимое — timestamp последней проверки.
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+        std::fs::write(&tne_path, timestamp.to_string())
+            .map_err(|e| CacheError::WriteFailed(format!("{}: {}", tne_path.display(), e)))
+    }
+
     /// Читает тайл с диска, обходя `.tne`-маркеры и расширения файлов.
     fn read_tile_from_disk(
         &self,
