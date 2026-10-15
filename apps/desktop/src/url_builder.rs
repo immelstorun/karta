@@ -36,8 +36,7 @@ impl UrlTemplate {
     }
 
     /// Устанавливает поддомены для `{s}`.
-    /// TODO(Phase 1): будет вызываться при загрузке TOML-слоя с поддоменами.
-    #[cfg_attr(not(test), expect(dead_code))]
+    /// TODO(Phase 2): будет вызываться при загрузке TOML-слоя с поддоменами.
     pub fn set_subdomains(&mut self, subdomains: &[&str]) {
         self.subdomains = subdomains.iter().map(|s| s.to_string()).collect();
     }

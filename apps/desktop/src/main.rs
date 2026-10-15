@@ -1,11 +1,5 @@
 //! Точка входа desktop-приложения karta.
 
-mod app;
-mod map_state;
-mod paint;
-mod tile_manager;
-mod url_builder;
-
 use anyhow::Result;
 
 fn main() -> Result<()> {
@@ -30,7 +24,7 @@ fn main() -> Result<()> {
     eframe::run_native(
         "karta — карта для туристов",
         options,
-        Box::new(|cc| Ok(Box::new(app::KartaApp::new(cc)))),
+        Box::new(|cc| Ok(Box::new(karta_desktop::app::KartaApp::new(cc)))),
     )?;
 
     Ok(())
