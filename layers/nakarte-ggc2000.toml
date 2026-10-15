@@ -1,0 +1,28 @@
+# nakarte.me — Советские топокарты ГГЦ (Генеральный штаб)
+# Источник: https://tiles.nakarte.me/ggc2000/{z}/{x}/{y}
+# Формат: TMS (Y перевёрнут)
+# Покрытие: Россия, СНГ, частично Европа
+
+[id]
+name = "ggc2000"
+description = "Советские топокарты ГГЦ 1:200000 (2 км в дюйме)"
+version = "1.0.0"
+author = "nakarte.me"
+license = "CC-BY-SA 4.0"
+
+[url]
+template = "https://tiles.nakarte.me/ggc2000/{z}/{x}/{y}"
+tms_y_flip = true
+
+[zoom]
+min = 0
+max = 12
+native_max = 12
+
+[attribution]
+text = "© ГГЦ, nakarte.me"
+url = "https://nakarte.me"
+
+[cache]
+type = "sas-planet"
+enabled = true

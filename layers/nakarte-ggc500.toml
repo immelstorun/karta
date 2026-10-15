@@ -1,0 +1,27 @@
+# nakarte.me — Советские топокарты ГГЦ 1:500000
+# Источник: https://tiles.nakarte.me/ggc500/{z}/{x}/{y}
+# Формат: TMS (Y перевёрнут)
+
+[id]
+name = "ggc500"
+description = "Советские топокарты ГГЦ 1:500000 (500 м в дюйме)"
+version = "1.0.0"
+author = "nakarte.me"
+license = "CC-BY-SA 4.0"
+
+[url]
+template = "https://tiles.nakarte.me/ggc500/{z}/{x}/{y}"
+tms_y_flip = true
+
+[zoom]
+min = 0
+max = 14
+native_max = 14
+
+[attribution]
+text = "© ГГЦ, nakarte.me"
+url = "https://nakarte.me"
+
+[cache]
+type = "sas-planet"
+enabled = true

@@ -1,0 +1,27 @@
+# nakarte.me — Топокарты ГГЦ 1:250000 (альтернативный источник)
+# Источник: https://tiles.nakarte.me/topo250/{z}/{x}/{y}
+# Формат: TMS (Y перевёрнут)
+
+[id]
+name = "topo250"
+description = "Топокарты ГГЦ 1:250000 (альтернативный источник)"
+version = "1.0.0"
+author = "nakarte.me"
+license = "CC-BY-SA 4.0"
+
+[url]
+template = "https://tiles.nakarte.me/topo250/{z}/{x}/{y}"
+tms_y_flip = true
+
+[zoom]
+min = 0
+max = 15
+native_max = 15
+
+[attribution]
+text = "© ГГЦ, nakarte.me"
+url = "https://nakarte.me"
+
+[cache]
+type = "sas-planet"
+enabled = true

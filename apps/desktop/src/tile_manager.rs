@@ -19,9 +19,6 @@ pub enum TileResponse {
     Error(TileId, String),
 }
 
-/// Имя слоя OSM в SAS.Planet кэше.
-const LAYER: &str = "osm";
-
 /// Максимальное количество тайлов в памяти.
 const MAX_MEMORY_TILES: usize = 500;
 
@@ -36,6 +33,8 @@ pub struct TileManager {
     sas_cache: Arc<SasCache>,
     /// Шаблон URL тайлового сервера.
     url_template: UrlTemplate,
+    /// Имя слоя (для SAS.Planet кэша).
+    layer_name: String,
     /// Тайлы в процессе загрузки: TileId → время начала загрузки.
     pending_tiles: HashMap<TileId, Instant>,
     /// Загруженные тайлы (декодированные изображения).
@@ -56,7 +55,11 @@ pub struct TileManager {
 
 impl TileManager {
     /// Создаёт менеджер тайлов с корневым каталогом кэша `cache_dir`.
-    pub fn new(cache_dir: PathBuf, url_template: UrlTemplate) -> anyhow::Result<Self> {
+    pub fn new(
+        cache_dir: PathBuf,
+        url_template: UrlTemplate,
+        layer_name: &str,
+    ) -> anyhow::Result<Self> {
         let runtime = tokio::runtime::Builder::new_multi_thread()
             .worker_threads(2)
             .enable_all()
@@ -78,6 +81,7 @@ impl TileManager {
             client,
             sas_cache,
             url_template,
+            layer_name: layer_name.to_string(),
             pending_tiles: HashMap::new(),
             loaded_tiles: HashMap::new(),
             tile_order: Vec::new(),
@@ -87,6 +91,16 @@ impl TileManager {
             cache_hits: 0,
             errors: 0,
         })
+    }
+
+    /// Устанавливает новый шаблон URL (при переключении слоя).
+    pub fn set_url_template(&mut self, template: UrlTemplate) {
+        self.url_template = template;
+    }
+
+    /// Устанавливает имя слоя (для SAS.Planet кэша).
+    pub fn set_layer_name(&mut self, name: &str) {
+        self.layer_name = name.to_string();
     }
 
     /// Количество тайлов в памяти.
@@ -123,7 +137,9 @@ impl TileManager {
     fn try_load_from_cache(&mut self, tile: &TileId) -> bool {
         // SasCache::get_tile — async (trait TileCache), вызываем через block_on.
         // Это безопасно: мы не внутри async-контекста.
-        let cache_data = self.runtime.block_on(self.sas_cache.get_tile(LAYER, tile));
+        let cache_data = self
+            .runtime
+            .block_on(self.sas_cache.get_tile(&self.layer_name, tile));
 
         match cache_data {
             Ok(Some(data)) => match image::load_from_memory(&data) {
@@ -187,9 +203,11 @@ impl TileManager {
         let sender = self.sender.clone();
         let url = self.url_template.build_url(tile);
         let tile_id = *tile;
+        let layer_name = self.layer_name.clone();
 
         self.runtime.spawn(async move {
-            let response = fetch_and_cache_tile(&client, &sas_cache, tile_id, &url).await;
+            let response =
+                fetch_and_cache_tile(&client, &sas_cache, &layer_name, tile_id, &url).await;
             let _ = sender.send(response);
         });
     }
@@ -218,6 +236,7 @@ impl TileManager {
 async fn fetch_and_cache_tile(
     client: &reqwest::Client,
     sas_cache: &SasCache,
+    layer_name: &str,
     tile: TileId,
     url: &str,
 ) -> TileResponse {
@@ -240,7 +259,7 @@ async fn fetch_and_cache_tile(
     }
 
     // Сохраняем в SAS.Planet кэш.
-    if let Err(e) = sas_cache.put_tile(LAYER, &tile, &bytes).await {
+    if let Err(e) = sas_cache.put_tile(layer_name, &tile, &bytes).await {
         tracing::warn!(?tile, error = %e, "Не удалось записать тайл в кэш");
     }
 

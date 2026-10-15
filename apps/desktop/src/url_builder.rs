@@ -16,6 +16,8 @@ pub struct UrlTemplate {
     template: String,
     /// Список поддоменов для `{s}`.
     subdomains: Vec<String>,
+    /// Переворачивать Y для TMS-формата (y_tms = 2^z - 1 - y_xyz).
+    tms_y_flip: bool,
 }
 
 impl UrlTemplate {
@@ -24,6 +26,7 @@ impl UrlTemplate {
         Self {
             template: template.to_string(),
             subdomains: Vec::new(),
+            tms_y_flip: false,
         }
     }
 
@@ -39,12 +42,24 @@ impl UrlTemplate {
         self.subdomains = subdomains.iter().map(|s| s.to_string()).collect();
     }
 
+    /// Включает TMS Y-flip (переворот координаты Y).
+    pub fn set_tms_y_flip(&mut self, flip: bool) {
+        self.tms_y_flip = flip;
+    }
+
     /// Строит URL для заданного тайла.
     pub fn build_url(&self, tile: &TileId) -> String {
         let mut url = self.template.clone();
         url = url.replace("{z}", &tile.zoom.to_string());
         url = url.replace("{x}", &tile.x.to_string());
-        url = url.replace("{y}", &tile.y.to_string());
+
+        let y = if self.tms_y_flip {
+            // TMS: y_tms = 2^z - 1 - y_xyz
+            (1u64 << tile.zoom) - 1 - tile.y as u64
+        } else {
+            tile.y as u64
+        };
+        url = url.replace("{y}", &y.to_string());
         url = url.replace("{q}", &karta_core::tiles::quadkey(tile));
 
         if url.contains("{s}") {
@@ -106,5 +121,31 @@ mod tests {
         };
         let url = template.build_url(&tile);
         assert_eq!(url, "https://example.com/213.png");
+    }
+
+    #[test]
+    fn test_tms_y_flip() {
+        let mut template = UrlTemplate::new("https://tiles.nakarte.me/ggc500/{z}/{x}/{y}");
+        template.set_tms_y_flip(true);
+        let tile = TileId {
+            x: 2400,
+            y: 1280,
+            zoom: 12,
+        };
+        let url = template.build_url(&tile);
+        // y_tms = 2^12 - 1 - 1280 = 4095 - 1280 = 2815
+        assert_eq!(url, "https://tiles.nakarte.me/ggc500/12/2400/2815");
+    }
+
+    #[test]
+    fn test_no_tms_y_flip_by_default() {
+        let template = UrlTemplate::new("https://tiles.nakarte.me/topomapper/{z}/{x}/{y}");
+        let tile = TileId {
+            x: 2400,
+            y: 1280,
+            zoom: 12,
+        };
+        let url = template.build_url(&tile);
+        assert_eq!(url, "https://tiles.nakarte.me/topomapper/12/2400/1280");
     }
 }

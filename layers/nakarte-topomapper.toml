@@ -1,0 +1,27 @@
+# nakarte.me — TopoMapper (топографические карты OpenStreetMap)
+# Источник: https://tiles.nakarte.me/topomapper/{z}/{x}/{y}
+# Формат: XYZ (стандартный OSM)
+
+[id]
+name = "topomapper"
+description = "TopoMapper — топографические карты на основе OSM"
+version = "1.0.0"
+author = "nakarte.me"
+license = "CC-BY-SA 4.0"
+
+[url]
+template = "https://tiles.nakarte.me/topomapper/{z}/{x}/{y}"
+tms_y_flip = false
+
+[zoom]
+min = 0
+max = 18
+native_max = 18
+
+[attribution]
+text = "© TopoMapper, nakarte.me"
+url = "https://nakarte.me"
+
+[cache]
+type = "sas-planet"
+enabled = true

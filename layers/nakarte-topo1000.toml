@@ -1,0 +1,27 @@
+# nakarte.me — Топокарты ГГЦ 1:100000 (альтернативный источник)
+# Источник: https://tiles.nakarte.me/topo1000/{z}/{x}/{y}
+# Формат: TMS (Y перевёрнут)
+
+[id]
+name = "topo1000"
+description = "Топокарты ГГЦ 1:100000 (альтернативный источник)"
+version = "1.0.0"
+author = "nakarte.me"
+license = "CC-BY-SA 4.0"
+
+[url]
+template = "https://tiles.nakarte.me/topo1000/{z}/{x}/{y}"
+tms_y_flip = true
+
+[zoom]
+min = 0
+max = 13
+native_max = 13
+
+[attribution]
+text = "© ГГЦ, nakarte.me"
+url = "https://nakarte.me"
+
+[cache]
+type = "sas-planet"
+enabled = true

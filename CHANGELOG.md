@@ -5,6 +5,28 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/),
 версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [0.1.0] — 2026-10-15
+
+### Added
+
+- **nakarte.me Tile Proxy** — проксирование тайлов nakarte.me в UI karta:
+  - Поддержка TMS Y-flip (`tms_y_flip = true`) для советских топокарт ГГЦ
+  - Слои: ГГЦ 1:200000, ГГЦ 1:250000, ГГЦ 1:500000, TopoMapper, OSM
+  - Переключение между слоями через меню Layers
+  - Кэширование в SAS.Planet-совместимом формате
+- **TOML-слои nakarte.me** (`layers/nakarte-*.toml`):
+  - `nakarte-ggc2000.toml`, `nakarte-ggc1000.toml`, `nakarte-ggc500.toml`, `nakarte-ggc250.toml`
+  - `nakarte-topo1000.toml`, `nakarte-topo500.toml`, `nakarte-topo250.toml`
+  - `nakarte-new_gsh_100k.toml`, `nakarte-new_gsh_050k.toml`
+  - `nakarte-purikov.toml`, `nakarte-topomapper.toml`
+- **82 юнит-теста** — все проходят (добавлены тесты TMS Y-flip)
+
+### Changed
+
+- `UrlTemplate` — добавлена поддержка TMS Y-flip (`set_tms_y_flip()`)
+- `TileManager` — поддержка нескольких слоёв (`layer_name`, `set_url_template()`, `set_layer_name()`)
+- `KartaApp` — переключение между слоями через UI
+
 ## [0.0.1] — 2026-10-14
 
 ### Added

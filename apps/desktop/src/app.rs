@@ -10,6 +10,17 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::time::Duration;
 
+/// Описание картографического слоя.
+#[derive(Debug, Clone)]
+pub struct LayerInfo {
+    /// Имя слоя (для кэша).
+    pub name: String,
+    /// Отображаемое название.
+    pub title: String,
+    /// Шаблон URL.
+    pub url_template: UrlTemplate,
+}
+
 /// Главное окно приложения karta.
 pub struct KartaApp {
     /// Менеджер тайлов: кэш + async-загрузка.
@@ -26,6 +37,10 @@ pub struct KartaApp {
     pub show_side_panel: bool,
     /// Счётчик кадров (для отладки производительности).
     pub frame_count: u64,
+    /// Доступные слои.
+    pub layers: Vec<LayerInfo>,
+    /// Индекс активного слоя.
+    pub active_layer: usize,
 }
 
 impl KartaApp {
@@ -38,9 +53,54 @@ impl KartaApp {
         };
         std::fs::create_dir_all(&cache_dir).expect("Не удалось создать каталог кэша");
 
-        let url_template = UrlTemplate::osm_default();
-        let tile_manager =
-            TileManager::new(cache_dir, url_template).expect("Не удалось создать TileManager");
+        // Слои nakarte.me (TMS Y-flip для советских топокарт).
+        let layers = vec![
+            LayerInfo {
+                name: "ggc500".to_string(),
+                title: "ГГЦ 1:500000".to_string(),
+                url_template: {
+                    let mut t = UrlTemplate::new("https://tiles.nakarte.me/ggc500/{z}/{x}/{y}");
+                    t.set_tms_y_flip(true);
+                    t
+                },
+            },
+            LayerInfo {
+                name: "ggc250".to_string(),
+                title: "ГГЦ 1:250000".to_string(),
+                url_template: {
+                    let mut t = UrlTemplate::new("https://tiles.nakarte.me/ggc250/{z}/{x}/{y}");
+                    t.set_tms_y_flip(true);
+                    t
+                },
+            },
+            LayerInfo {
+                name: "ggc2000".to_string(),
+                title: "ГГЦ 1:200000".to_string(),
+                url_template: {
+                    let mut t = UrlTemplate::new("https://tiles.nakarte.me/ggc2000/{z}/{x}/{y}");
+                    t.set_tms_y_flip(true);
+                    t
+                },
+            },
+            LayerInfo {
+                name: "topomapper".to_string(),
+                title: "TopoMapper".to_string(),
+                url_template: UrlTemplate::new("https://tiles.nakarte.me/topomapper/{z}/{x}/{y}"),
+            },
+            LayerInfo {
+                name: "osm".to_string(),
+                title: "OpenStreetMap".to_string(),
+                url_template: UrlTemplate::osm_default(),
+            },
+        ];
+
+        let active_layer = 0;
+        let tile_manager = TileManager::new(
+            cache_dir,
+            layers[active_layer].url_template.clone(),
+            &layers[active_layer].name,
+        )
+        .expect("Не удалось создать TileManager");
 
         Self {
             tile_manager,
@@ -50,7 +110,23 @@ impl KartaApp {
             show_grid: false,
             show_side_panel: true,
             frame_count: 0,
+            layers,
+            active_layer,
         }
+    }
+
+    /// Переключает активный слой.
+    pub fn switch_layer(&mut self, index: usize) {
+        if index >= self.layers.len() || index == self.active_layer {
+            return;
+        }
+        self.active_layer = index;
+        let layer = &self.layers[index];
+        self.tile_manager
+            .set_url_template(layer.url_template.clone());
+        self.tile_manager.set_layer_name(&layer.name);
+        // Очищаем загруженные тайлы — они от другого слоя.
+        self.tiles_textures.clear();
     }
 
     /// Обрабатывает ввод: мышь (drag → pan, scroll → zoom) и клавиатуру.
@@ -143,6 +219,17 @@ impl eframe::App for KartaApp {
                     ui.separator();
                     ui.checkbox(&mut self.show_grid, "Show grid");
                     ui.checkbox(&mut self.show_side_panel, "Show side panel");
+                });
+                ui.menu_button("Layers", |ui| {
+                    let layers = self.layers.clone();
+                    for (i, layer) in layers.iter().enumerate() {
+                        if ui
+                            .radio_value(&mut self.active_layer, i, &layer.title)
+                            .clicked()
+                        {
+                            self.switch_layer(i);
+                        }
+                    }
                 });
                 ui.menu_button("Help", |ui| {
                     ui.label("karta — карта для туристов");
