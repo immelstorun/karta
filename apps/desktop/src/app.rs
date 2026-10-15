@@ -58,6 +58,26 @@ impl KartaApp {
         // Слои nakarte.me (TMS Y-flip для советских топокарт).
         let layers = vec![
             LayerInfo {
+                name: "ggc2000".to_string(),
+                title: "ГГЦ 1:200000".to_string(),
+                url_template: {
+                    let mut t = UrlTemplate::new("https://tiles.nakarte.me/ggc2000/{z}/{x}/{y}");
+                    t.set_tms_y_flip(true);
+                    t
+                },
+                opacity: 1.0,
+            },
+            LayerInfo {
+                name: "ggc1000".to_string(),
+                title: "ГГЦ 1:100000".to_string(),
+                url_template: {
+                    let mut t = UrlTemplate::new("https://tiles.nakarte.me/ggc1000/{z}/{x}/{y}");
+                    t.set_tms_y_flip(true);
+                    t
+                },
+                opacity: 1.0,
+            },
+            LayerInfo {
                 name: "ggc500".to_string(),
                 title: "ГГЦ 1:500000".to_string(),
                 url_template: {
@@ -78,10 +98,10 @@ impl KartaApp {
                 opacity: 1.0,
             },
             LayerInfo {
-                name: "ggc2000".to_string(),
-                title: "ГГЦ 1:200000".to_string(),
+                name: "topo1000".to_string(),
+                title: "Топо 1:100000".to_string(),
                 url_template: {
-                    let mut t = UrlTemplate::new("https://tiles.nakarte.me/ggc2000/{z}/{x}/{y}");
+                    let mut t = UrlTemplate::new("https://tiles.nakarte.me/topo1000/{z}/{x}/{y}");
                     t.set_tms_y_flip(true);
                     t
                 },
@@ -91,6 +111,38 @@ impl KartaApp {
                 name: "topomapper".to_string(),
                 title: "TopoMapper".to_string(),
                 url_template: UrlTemplate::new("https://tiles.nakarte.me/topomapper/{z}/{x}/{y}"),
+                opacity: 1.0,
+            },
+            LayerInfo {
+                name: "new_gsh_100k".to_string(),
+                title: "Новые ГШ 1:100000".to_string(),
+                url_template: {
+                    let mut t =
+                        UrlTemplate::new("https://tiles.nakarte.me/new_gsh_100k/{z}/{x}/{y}");
+                    t.set_tms_y_flip(true);
+                    t
+                },
+                opacity: 1.0,
+            },
+            LayerInfo {
+                name: "new_gsh_050k".to_string(),
+                title: "Новые ГШ 1:50000".to_string(),
+                url_template: {
+                    let mut t =
+                        UrlTemplate::new("https://tiles.nakarte.me/new_gsh_050k/{z}/{x}/{y}");
+                    t.set_tms_y_flip(true);
+                    t
+                },
+                opacity: 1.0,
+            },
+            LayerInfo {
+                name: "purikov".to_string(),
+                title: "Горы (Purikov)".to_string(),
+                url_template: {
+                    let mut t = UrlTemplate::new("https://tiles.nakarte.me/purikov/{z}/{x}/{y}");
+                    t.set_tms_y_flip(true);
+                    t
+                },
                 opacity: 1.0,
             },
             LayerInfo {
