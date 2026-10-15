@@ -68,6 +68,9 @@ pub fn paint_map(ui: &mut egui::Ui, app: &mut KartaApp, show_grid: bool) {
     }
 }
 
+/// Максимальное количество GPU-текстур в памяти.
+const MAX_GPU_TEXTURES: usize = 500;
+
 /// Синхронизирует текстуры egui с загруженными тайлами.
 pub fn sync_textures(app: &mut KartaApp, ctx: &egui::Context) {
     let tile_manager = &mut app.tile_manager;
@@ -91,6 +94,14 @@ pub fn sync_textures(app: &mut KartaApp, ctx: &egui::Context) {
 
     // Чистим текстуры для тайлов, выгруженных из памяти.
     tiles_textures.retain(|tile, _| tile_manager.is_loaded(tile));
+
+    // LRU eviction для GPU-текстур при превышении лимита.
+    while tiles_textures.len() > MAX_GPU_TEXTURES {
+        // Удаляем самую старую текстуру (первый ключ в HashMap).
+        if let Some(&oldest) = tiles_textures.keys().next() {
+            tiles_textures.remove(&oldest);
+        }
+    }
 }
 
 /// Масштабный коэффициент тайла при дробном зуме:

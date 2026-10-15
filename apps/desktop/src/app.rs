@@ -275,7 +275,7 @@ impl eframe::App for KartaApp {
                     self.tile_manager.pending_count()
                 ));
                 ui.separator();
-                // Attribution активного слоя.
+                // Источник тайлов и attribution.
                 if let Some(layer) = self.layers.get(self.active_layer) {
                     ui.label(format!("© {}", layer.title));
                 }

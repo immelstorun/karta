@@ -94,7 +94,7 @@
 - [x] Интеграция `karta-net` + `karta-cache` с nakarte.me слоями
 - [x] Кэширование в SAS.Planet-совместимом формате
 - [x] `.tne` маркеры для несуществующих тайлов (404 → маркер в кэше)
-- [ ] LRU eviction для GPU-текстур
+- [x] LRU eviction для GPU-текстур (MAX_GPU_TEXTURES = 500)
 
 ### 1.3 UI
 
