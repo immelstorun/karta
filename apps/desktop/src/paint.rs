@@ -20,6 +20,13 @@ pub fn paint_map(ui: &mut egui::Ui, app: &mut KartaApp, show_grid: bool) {
     // 1. Очистить фон (тёмно-серый).
     painter.rect_filled(viewport, 0.0, PLACEHOLDER_COLOR);
 
+    // Прозрачность активного слоя.
+    let opacity = app
+        .layers
+        .get(app.active_layer)
+        .map(|l| l.opacity)
+        .unwrap_or(1.0);
+
     // 2. Отрисовка видимых тайлов.
     let map_state = app.map_state.clone();
     let visible = compute_visible_tiles(&map_state, viewport);
@@ -38,11 +45,13 @@ pub fn paint_map(ui: &mut egui::Ui, app: &mut KartaApp, show_grid: bool) {
         // Если текстура загружена — рисуем; иначе заглушка.
         match app.tiles_textures.get(tile) {
             Some(texture) => {
+                // Применяем прозрачность слоя.
+                let color = Color32::from_white_alpha((opacity * 255.0) as u8);
                 painter.image(
                     texture.id(),
                     rect,
                     Rect::from_min_max(Pos2::new(0.0, 0.0), Pos2::new(1.0, 1.0)),
-                    Color32::WHITE,
+                    color,
                 );
             }
             None => {

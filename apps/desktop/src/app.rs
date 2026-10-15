@@ -19,6 +19,8 @@ pub struct LayerInfo {
     pub title: String,
     /// Шаблон URL.
     pub url_template: UrlTemplate,
+    /// Прозрачность слоя (0.0 — невидимый, 1.0 — полностью видимый).
+    pub opacity: f32,
 }
 
 /// Главное окно приложения karta.
@@ -63,6 +65,7 @@ impl KartaApp {
                     t.set_tms_y_flip(true);
                     t
                 },
+                opacity: 1.0,
             },
             LayerInfo {
                 name: "ggc250".to_string(),
@@ -72,6 +75,7 @@ impl KartaApp {
                     t.set_tms_y_flip(true);
                     t
                 },
+                opacity: 1.0,
             },
             LayerInfo {
                 name: "ggc2000".to_string(),
@@ -81,16 +85,19 @@ impl KartaApp {
                     t.set_tms_y_flip(true);
                     t
                 },
+                opacity: 1.0,
             },
             LayerInfo {
                 name: "topomapper".to_string(),
                 title: "TopoMapper".to_string(),
                 url_template: UrlTemplate::new("https://tiles.nakarte.me/topomapper/{z}/{x}/{y}"),
+                opacity: 1.0,
             },
             LayerInfo {
                 name: "osm".to_string(),
                 title: "OpenStreetMap".to_string(),
                 url_template: UrlTemplate::osm_default(),
+                opacity: 1.0,
             },
         ];
 
@@ -230,6 +237,12 @@ impl eframe::App for KartaApp {
                             self.switch_layer(i);
                         }
                     }
+                    ui.separator();
+                    // Прозрачность активного слоя.
+                    if let Some(layer) = self.layers.get_mut(self.active_layer) {
+                        ui.label("Прозрачность:");
+                        ui.add(egui::Slider::new(&mut layer.opacity, 0.0..=1.0));
+                    }
                 });
                 ui.menu_button("Help", |ui| {
                     ui.label("karta — карта для туристов");
@@ -261,6 +274,11 @@ impl eframe::App for KartaApp {
                     self.tile_manager.loaded_count(),
                     self.tile_manager.pending_count()
                 ));
+                ui.separator();
+                // Attribution активного слоя.
+                if let Some(layer) = self.layers.get(self.active_layer) {
+                    ui.label(format!("© {}", layer.title));
+                }
             });
         });
 

@@ -15,6 +15,8 @@
   - Переключение между слоями через меню Layers
   - Кэширование в SAS.Planet-совместимом формате
   - `.tne` маркеры для несуществующих тайлов (404 → маркер в кэше)
+  - Прозрачность слоёв (slider в меню Layers)
+  - Attribution в статусбаре
 - **TOML-слои nakarte.me** (`layers/nakarte-*.toml`):
   - `nakarte-ggc2000.toml`, `nakarte-ggc1000.toml`, `nakarte-ggc500.toml`, `nakarte-ggc250.toml`
   - `nakarte-topo1000.toml`, `nakarte-topo500.toml`, `nakarte-topo250.toml`
@@ -27,8 +29,9 @@
 
 - `UrlTemplate` — добавлена поддержка TMS Y-flip (`set_tms_y_flip()`)
 - `TileManager` — поддержка нескольких слоёв (`layer_name`, `set_url_template()`, `set_layer_name()`)
-- `KartaApp` — переключение между слоями через UI
+- `KartaApp` — переключение между слоями через UI, прозрачность слоёв
 - `SasCache` — добавлен `put_tne_marker()` для записи маркеров отсутствующих тайлов
+- `paint.rs` — применение прозрачности слоя при отрисовке тайлов
 
 ## [0.0.1] — 2026-10-14
 
