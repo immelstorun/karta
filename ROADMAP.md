@@ -86,7 +86,7 @@
 - [x] Исследование доступных слоёв nakarte.me
 - [x] TOML-манифесты для слоёв nakarte.me (ggc2000, ggc1000, ggc500, ggc250, topo1000, topo500, topo250, new_gsh_100k, new_gsh_050k, purikov, topomapper)
 - [x] Поддержка TMS Y-flip в URL-шаблонах (`tms_y_flip = true`)
-- [ ] Поддержка subdomains (`{s}` → a/b/c) для распределения нагрузки
+- [x] Поддержка subdomains (`{s}` → a/b/c) для распределения нагрузки (UrlTemplate)
 - [x] Автоматическая конвертация XYZ → TMS в `TileFetcher`
 
 ### 1.2 Загрузка и кэширование
@@ -101,7 +101,7 @@
 - [x] Панель слоёв с переключением между слоями nakarte.me
 - [x] Настройка прозрачности слоёв (для оверлеев)
 - [x] Отображение attribution
-- [ ] Статусбар: zoom, координаты, источник тайлов
+- [x] Статусбар: zoom, координаты, источник тайлов
 
 ### Milestone: v0.1.0 — "nakarte.me Proxy"
 
